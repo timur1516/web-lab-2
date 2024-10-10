@@ -1,0 +1,123 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+    display: table-cell;
+    vertical-align: top;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+table {
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+td, th {
+    border: 1px solid black;
+    font-weight: inherit;
+    padding: 5px;
+}
+
+.body_table {
+    margin: 5px auto;
+    font-weight: normal;
+    font-size: 17pt;
+    width: 100%;
+}
+
+.header {
+    font-family: fantasy;
+    font-size: 20px;
+}
+
+.header:hover {
+    background-color: darkcyan;
+}
+
+.header p::first-letter {
+    color: darkblue;
+}
+
+#error_field {
+    visibility: hidden;
+    background-color: #ea3267;
+    border-radius: 10px;
+    border: 2px solid red;
+    padding: 10px;
+    margin: 5px auto;
+    max-width: 400px;
+}
+
+.form_table {
+    border-collapse: separate;
+    margin: 0 auto;
+    padding: 10px;
+    border-radius: 20px;
+}
+
+.form_table:hover {
+    border: 2px solid darkblue;
+}
+
+.form_table td, .form_table th {
+    border: none;
+}
+
+input[type="radio"] {
+    width: 20px;
+    height: 20px;
+}
+
+#y_text {
+    width: 150px;
+    font-size: inherit;
+}
+
+input[type="button"] {
+    font-size: inherit;
+    width: 30px;
+    height: 30px;
+    border-color: black;
+    border-radius: 5px;
+}
+
+#submit_button {
+    font-size: inherit;
+    margin: 0 auto;
+    padding: 5px;
+}
+
+.graph_cell {
+    text-align: center;
+}
+
+#calculator {
+    margin: 0 auto;
+}
+
+.history_cell {
+    vertical-align: top;
+}
+
+#history_table {
+    width: 100%;
+}
+
+#history_table td, #history_table th {
+    text-align: center;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#history_table td {
+    word-break: break-all;
+}
+
+.footer {
+    text-align: center;
+}
