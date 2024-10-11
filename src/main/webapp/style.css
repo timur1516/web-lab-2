@@ -1,46 +1,56 @@
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
 }
 
 body {
-    height: 100vh;
-    width: 100vw;
-    display: table-cell;
-    vertical-align: top;
-    padding-left: 5px;
-    padding-right: 5px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #020920;
+    color: blue;
 }
 
-table {
-    table-layout: fixed;
-    border-collapse: collapse;
-}
-
-td, th {
-    border: 1px solid black;
-    font-weight: inherit;
-    padding: 5px;
-}
-
-.body_table {
-    margin: 5px auto;
-    font-weight: normal;
-    font-size: 17pt;
-    width: 100%;
-}
-
-.header {
+header, footer {
+    display: flex;
+    flex: 0 0 auto;
+    justify-content: space-around;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
     font-family: fantasy;
     font-size: 20px;
+    box-shadow: 0 0 10px 10px blue;
 }
 
-.header:hover {
-    background-color: darkcyan;
+footer {
+    justify-content: center;
+    margin-bottom: 0;
+    margin-top: 10px;
 }
 
-.header p::first-letter {
-    color: darkblue;
+.main_content {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    justify-content: flex-start;
+    font-size: 17px;
+}
+
+.main_form {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 10px auto;
+    padding: 10px;
+    border: 2px solid blue;
+    border-radius: 20px;
+    box-shadow: 0 0 10px 10px blue;
 }
 
 #error_field {
@@ -49,75 +59,103 @@ td, th {
     border-radius: 10px;
     border: 2px solid red;
     padding: 10px;
-    margin: 5px auto;
+    margin: 10px auto;
     max-width: 400px;
 }
 
-.form_table {
-    border-collapse: separate;
-    margin: 0 auto;
-    padding: 10px;
-    border-radius: 20px;
+.form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-.form_table:hover {
-    border: 2px solid darkblue;
+.form_input{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-content: center;
+    margin: 5px 0;
 }
 
-.form_table td, .form_table th {
-    border: none;
+.x_label, .y_label, .r_label{
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 10px;
+}
+
+#calculator {
+    margin-left: 10px;
+    width: 350px;
+    height: 350px
+}
+
+input {
+    font-size: inherit;
 }
 
 input[type="radio"] {
     width: 20px;
     height: 20px;
+    margin-left: 5px;
+    margin-right: 1px;
 }
 
-#y_text {
+#r_1{
+    margin-left: 0;
+}
+
+input[type="button"]{
+    width: 40px;
+    height: 30px;
+    border-radius: 10px;
+}
+
+input[type="number"] {
+    width: 150px;
+    padding: 2px;
+    border-radius: 8px;
+}
+
+input[type="submit"]{
+    padding: 5px;
+    border-radius: 10px;
+}
+
+button{
+    padding: 5px;
+    border-radius: 10px;
+    height: 40px;
     width: 150px;
     font-size: inherit;
+    margin-top: 5px;
 }
 
-input[type="button"] {
-    font-size: inherit;
-    width: 30px;
-    height: 30px;
-    border-color: black;
-    border-radius: 5px;
+.back{
+    display: flex;
+    justify-content: center;
 }
 
-#submit_button {
-    font-size: inherit;
-    margin: 0 auto;
-    padding: 5px;
+.x_button {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
 }
 
-.graph_cell {
-    text-align: center;
-}
-
-#calculator {
-    margin: 0 auto;
-}
-
-.history_cell {
-    vertical-align: top;
-}
-
-#history_table {
+table {
+    table-layout: fixed;
+    border-collapse: collapse;
     width: 100%;
 }
 
-#history_table td, #history_table th {
-    text-align: center;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-#history_table td {
+td, th {
+    border: 1px solid blue;
+    padding: 5px;
     word-break: break-all;
+    text-align: center;
 }
 
-.footer {
-    text-align: center;
+.history{
+    margin: 10px;
+    display: flex;
+    justify-content: center;
 }
