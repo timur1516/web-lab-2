@@ -86,7 +86,9 @@ footer {
 #calculator {
     margin-left: 10px;
     width: 350px;
-    height: 350px
+    height: 350px;
+    background-color: #020920;
+    border-radius: 20px;
 }
 
 input {

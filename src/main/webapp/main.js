@@ -18,7 +18,6 @@ let calculator = Desmos.GraphingCalculator(elt, {
     xAxisStep: 1,
     yAxisStep: 1
 });
-let calculatorRect = elt.getBoundingClientRect();
 
 let selectedR = null;
 
@@ -27,16 +26,20 @@ elt.addEventListener('click', function (evt) {
         show_user_message(message_type.CHOOSE_R);
         return;
     }
+    let calculatorRect = elt.getBoundingClientRect();
     let {x, y} = calculator.pixelsToMath({
         x: evt.clientX - calculatorRect.left,
         y: evt.clientY - calculatorRect.top
     });
-    calculator.setExpression({
-        id: 'point',
-        latex: `(${x}, ${y})`, // Задание координат точки
-        color: Desmos.Colors.RED // Цвет точки
+    checkPoint(x, y, selectedR, false).then(response =>{
+        if(response != null){
+            calculator.setExpression({
+                id: 'point',
+                latex: `(${x}, ${y})`, // Задание координат точки
+                color: Desmos.Colors.RED // Цвет точки
+            });
+        }
     });
-    checkPoint(x, y, selectedR);
 });
 
 function drawBatman(r) {
@@ -121,34 +124,36 @@ function submitForm(event) {
     const x = active_x_button == null ? null : active_x_button.value;
     const y = formData.get("y_text_input");
     const r = formData.get("r_radio_input");
-    checkPoint(x, y, r);
+    checkPoint(x, y, r, true);
 }
 
-function checkPoint(x, y, r){
+async function checkPoint(x, y, r, redirect){
     //Проводим валидацию
     let result = validate_data(x, y, r);
     show_user_message(result);
-    if (result !== message_type.OK) return;
+    if (result !== message_type.OK) return null;
 
     //Выполняем запрос
     const queryParams = new URLSearchParams();
     queryParams.append("X", x);
     queryParams.append("Y", y);
     queryParams.append("R", r);
-
-    let response = fetch(`MyMVC?${queryParams.toString()}`).then(response => {
+    queryParams.append("redirect", redirect);
+    try {
+        let response = await fetch(`MyMVC?${queryParams.toString()}`);
         if (!response.ok) {
             show_user_message(message_type.SOME_SERVER_ERROR);
-            return;
+            return null;
         }
         if (response.redirected) {
             window.location.href = response.url;
         }
-    }).then(data => {
-        //TODO: Добавить обработку данных
-    }).catch(error => {
-        //TODO: Добавить обработку ошибок
-    });
+        let responseData = await response.json();
+        return responseData.hit;
+    } catch (error){
+        show_user_message(message_type.SOME_SERVER_ERROR);
+        return null;
+    }
 }
 
 // Метод генерации сообщений пользователю

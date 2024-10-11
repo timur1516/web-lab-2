@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class ControllerServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Pattern pattern = Pattern.compile("^X=.*&Y=.*&R=.*$");
+        Pattern pattern = Pattern.compile("^X=.*&Y=.*&R=.*&redirect=.*$");
         Matcher matcher = pattern.matcher(req.getQueryString() == null ? "" : req.getQueryString());
         if(matcher.matches()) {
             req.getRequestDispatcher("AreaCheck").forward(req, resp);
