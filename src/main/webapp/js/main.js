@@ -11,15 +11,14 @@ const message_type = Object.freeze({
 
 let selectedR = null;
 
-document.getElementById('calculator').addEventListener('click', function (evt) {
+document.getElementById('calculator').addEventListener('click', async function (evt) {
     if (selectedR == null) {
         show_user_message(message_type.CHOOSE_R);
         return;
     }
     let point = getClickCoordinates(evt.clientX, evt.clientY);
-    check_point(point.x, point.y, selectedR, false, (hit) =>{
-        drawPoint(point, hit ? 'green' : 'red');
-    });
+    const hit = await check_point(point.x, point.y, selectedR, false);
+    drawPoint(point, hit ? 'green' : 'red');
 });
 
 const r_radiobuttons = document.getElementsByName("r_radio_input");
@@ -46,18 +45,19 @@ x_buttons.forEach(button => {
 });
 
 document.getElementById("form").addEventListener("submit", () => submitForm(event));
+
 //Функция отправки запроса на сервер и получения ответа
-function submitForm(event) {
+async function submitForm(event) {
     event.preventDefault();
     //Извлекаем данные формы
     const formData = new FormData(event.target);
     const x = active_x_button == null ? null : active_x_button.value;
     const y = formData.get("y_text_input");
     const r = formData.get("r_radio_input");
-    check_point(x, y, r, true);
+    await check_point(x, y, r, true);
 }
 
-function check_point(x, y, r, redirect, callback) {
+async function check_point(x, y, r, redirect) {
     let result = validate_data(x, y, r);
     show_user_message(result);
     if (result !== message_type.OK) return;
@@ -67,30 +67,30 @@ function check_point(x, y, r, redirect, callback) {
     queryParams.append("Y", y);
     queryParams.append("R", r);
     queryParams.append("redirect", redirect);
-
-    fetch(`MyMVC?${queryParams.toString()}`)
-        .then(response => {
-            if (response.redirected) {
-                if(redirect) window.location.href = response.url;
-                else{
-                    throw Error('Redirect was not expected');
-                }
-            }
-            return response.json();
-        })
-        .then(data => {
-            add_data_to_history(
-                data.x,
-                data.y,
-                data.r,
-                data.hit,
-                data.calculationTime,
-                new Date(data.time[0], data.time[1] - 1, data.time[2], data.time[3], data.time[4], data.time[5]));
-            callback(data.hit);
-        })
-        .catch(() => {
+    try {
+        const response = await fetch(`MyMVC?${queryParams.toString()}`);
+        if (response.redirected ^ redirect) {
             show_user_message(message_type.SOME_SERVER_ERROR);
-        });
+            return;
+        }
+        if (redirect){
+            window.location.href = response.url;
+            return;
+        }
+
+        const data = await response.json();
+        add_data_to_history(
+            data.x,
+            data.y,
+            data.r,
+            data.hit,
+            data.calculationTime,
+            new Date(data.time[0], data.time[1] - 1, data.time[2], data.time[3], data.time[4], data.time[5])
+        );
+        return data.hit;
+    } catch (e) {
+        show_user_message(message_type.SOME_SERVER_ERROR);
+    }
 }
 
 function add_data_to_history(x, y, r, hit, execution_time, real_time) {
@@ -133,13 +133,13 @@ function validate_data(x, y, r) {
     return message_type.OK;
 }
 
-function loadPoints(){
+function loadPoints() {
     fetch(`MyMVC?data`)
         .then(response => {
             return response.json();
         })
         .then(data => {
-            if(data == null) return;
+            if (data == null) return;
             data.data.forEach(point => {
                 drawPoint(point, point.hit ? 'green' : 'red');
             });
