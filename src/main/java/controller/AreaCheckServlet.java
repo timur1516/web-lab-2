@@ -42,7 +42,7 @@ public class AreaCheckServlet extends HttpServlet {
         data.addRPoint(rPoint);
         req.getSession().setAttribute("data", data);
         if (redirect) {
-            resp.sendRedirect(req.getContextPath() + "/result.jsp");
+            resp.sendRedirect(req.getContextPath() + "/jsp/result.jsp");
         } else {
             PrintWriter out = resp.getWriter();
             resp.setContentType("application/json");

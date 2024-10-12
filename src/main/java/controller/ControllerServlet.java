@@ -19,7 +19,6 @@ public class ControllerServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/index.jsp");
             return;
         }
-        System.out.println(req.getQueryString());
         if(Objects.equals(req.getQueryString(), "data")){
             PrintWriter out = resp.getWriter();
             resp.setContentType("application/json");

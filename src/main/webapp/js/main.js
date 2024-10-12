@@ -17,10 +17,9 @@ document.getElementById('calculator').addEventListener('click', function (evt) {
         return;
     }
     let point = getClickCoordinates(evt.clientX, evt.clientY);
-    let response = checkPoint(point.x, point.y, selectedR, false);
-    if (response != null) {
-        drawPoint(point);
-    }
+    check_point(point.x, point.y, selectedR, false, (hit) =>{
+        drawPoint(point, hit ? 'green' : 'red');
+    });
 });
 
 const r_radiobuttons = document.getElementsByName("r_radio_input");
@@ -55,28 +54,27 @@ function submitForm(event) {
     const x = active_x_button == null ? null : active_x_button.value;
     const y = formData.get("y_text_input");
     const r = formData.get("r_radio_input");
-    checkPoint(x, y, r, true);
+    check_point(x, y, r, true);
 }
 
-function checkPoint(x, y, r, redirect) {
-    //Проводим валидацию
+function check_point(x, y, r, redirect, callback) {
     let result = validate_data(x, y, r);
     show_user_message(result);
-    if (result !== message_type.OK) return null;
+    if (result !== message_type.OK) return;
 
-    //Выполняем запрос
     const queryParams = new URLSearchParams();
     queryParams.append("X", x);
     queryParams.append("Y", y);
     queryParams.append("R", r);
     queryParams.append("redirect", redirect);
-    return fetch(`MyMVC?${queryParams.toString()}`)
+
+    fetch(`MyMVC?${queryParams.toString()}`)
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Not OK response status');
-            }
             if (response.redirected) {
-                window.location.href = response.url;
+                if(redirect) window.location.href = response.url;
+                else{
+                    throw Error('Redirect was not expected');
+                }
             }
             return response.json();
         })
@@ -88,11 +86,10 @@ function checkPoint(x, y, r, redirect) {
                 data.hit,
                 data.calculationTime,
                 new Date(data.time[0], data.time[1] - 1, data.time[2], data.time[3], data.time[4], data.time[5]));
-            return data.hit;
+            callback(data.hit);
         })
         .catch(() => {
             show_user_message(message_type.SOME_SERVER_ERROR);
-            return null;
         });
 }
 
@@ -139,19 +136,15 @@ function validate_data(x, y, r) {
 function loadPoints(){
     fetch(`MyMVC?data`)
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Not OK response status');
-            }
             return response.json();
         })
         .then(data => {
             if(data == null) return;
             data.data.forEach(point => {
-                drawPoint(point)
+                drawPoint(point, point.hit ? 'green' : 'red');
             });
         })
-        .catch(e => {
-            throw e;
-            // show_user_message(message_type.SOME_SERVER_ERROR);
+        .catch(() => {
+            show_user_message(message_type.SOME_SERVER_ERROR);
         });
 }

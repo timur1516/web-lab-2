@@ -1,30 +1,20 @@
-<%@ page import="model.DataBean" %>
-<%@ page import="java.text.DecimalFormat" %>
-<%@ page import="model.RPoint" %>
-<%@ page import="java.time.format.DateTimeFormatter" %>
-<%@ page import="java.time.LocalDateTime" %>
-<%@ page import="java.util.Collections" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Comparator" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Lab1</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/form.css">
     <script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+    <script type="module" src="js/main.js"></script>
 </head>
 <body>
-<header>
-    <span>Ступин Тимур</span>
-    <span>P3208</span>
-    <span>Вариант: 229</span>
-</header>
+<jsp:include page="jsp/header.jsp"/>
 <section class="main_content">
     <p id="error_field"></p>
     <div class="main_form">
-        <form class="form" onsubmit="submitForm(event)">
+        <form class="form" id="form">
             <div class="form_input">
                 <p class="form_input x_label">X</p>
                 <div class="form_input x_button">
@@ -66,50 +56,8 @@
         </form>
         <div id="calculator"></div>
     </div>
-    <div class="history">
-        <table id="history_table">
-            <thead>
-            <tr>
-                <th>X</th>
-                <th>Y</th>
-                <th>R</th>
-                <th>Попадание</th>
-                <th>Время запроса</th>
-                <th>Время выполнения</th>
-            </tr>
-            </thead>
-            <tbody>
-            <%
-                DataBean data = (DataBean) request.getSession().getAttribute("data");
-                if (data == null) {
-                    data = new DataBean();
-                }
-                DecimalFormat df = new DecimalFormat("0.00");
-                List<RPoint> arr = data.getData();
-                for (int i = arr.size() - 1; i >= 0; i--) {
-            %>
-            <tr>
-                <td><%=df.format(arr.get(i).getX())%>
-                </td>
-                <td><%=df.format(arr.get(i).getY())%>
-                </td>
-                <td><%=df.format(arr.get(i).getR())%>
-                </td>
-                <td><%=arr.get(i).isHit() ? "Попал" : "Промазал"%>
-                </td>
-                <td><%=arr.get(i).getTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))%>
-                </td>
-                <td><%=arr.get(i).getCalculationTime()%>мкс
-                </td>
-            </tr>
-            <%}%>
-            </tbody>
-        </table>
-    </div>
+    <jsp:include page="jsp/historyTable.jsp"/>
 </section>
-<footer>
-    ИТМО 2024
-</footer>
-<script type="text/javascript" src="main.js"></script>
+<jsp:include page="jsp/footer.jsp"/>
 </body>
 </html>
