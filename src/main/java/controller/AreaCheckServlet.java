@@ -1,6 +1,7 @@
 package controller;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -10,15 +11,13 @@ import model.RPoint;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @WebServlet("/AreaCheck")
 public class AreaCheckServlet extends HttpServlet {
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         RPoint rPoint = new RPoint();
-
         rPoint.setTime(LocalDateTime.now());
         boolean redirect = true;
         try {
@@ -36,21 +35,22 @@ public class AreaCheckServlet extends HttpServlet {
         rPoint.setCalculationTime(endTime - startTime);
 
         DataBean data = (DataBean) req.getSession().getAttribute("data");
-        if(data == null) {
+        if (data == null) {
             data = new DataBean();
             req.getSession().setAttribute("data", data);
         }
         data.addRPoint(rPoint);
         req.getSession().setAttribute("data", data);
-        if(redirect) {
+        if (redirect) {
             resp.sendRedirect(req.getContextPath() + "/result.jsp");
         } else {
             PrintWriter out = resp.getWriter();
             resp.setContentType("application/json");
             resp.setCharacterEncoding("UTF-8");
-            Map<String, Object> jsonResponse = new HashMap<>();
-            jsonResponse.put("hit", rPoint.isHit());
-            out.print(new Gson().toJson(jsonResponse));
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.findAndRegisterModules();
+            String jsonResponse = objectMapper.writeValueAsString(rPoint);
+            out.print(jsonResponse);
             out.flush();
         }
     }

@@ -1,3 +1,4 @@
+window.addEventListener("load", loadPoints);
 // Подобие enum для обработки исключений и вывода сообщений
 const message_type = Object.freeze({
     OK: 1,
@@ -22,7 +23,7 @@ let calculator = Desmos.GraphingCalculator(elt, {
 let selectedR = null;
 
 elt.addEventListener('click', function (evt) {
-    if(selectedR == null){
+    if (selectedR == null) {
         show_user_message(message_type.CHOOSE_R);
         return;
     }
@@ -31,15 +32,13 @@ elt.addEventListener('click', function (evt) {
         x: evt.clientX - calculatorRect.left,
         y: evt.clientY - calculatorRect.top
     });
-    checkPoint(x, y, selectedR, false).then(response =>{
-        if(response != null){
-            calculator.setExpression({
-                id: 'point',
-                latex: `(${x}, ${y})`, // Задание координат точки
-                color: Desmos.Colors.RED // Цвет точки
-            });
-        }
-    });
+    let response = checkPoint(x, y, selectedR, false);
+    if (response != null) {
+        calculator.setExpression({
+            latex: `(${x}, ${y})`, // Задание координат точки
+            color: Desmos.Colors.RED // Цвет точки
+        });
+    }
 });
 
 function drawBatman(r) {
@@ -101,7 +100,6 @@ r_radiobuttons.forEach(radiobutton => {
 });
 
 let active_x_button = null;
-// Бинарный ввод X ;)
 const x_buttons = document.getElementsByName("x_button_input");
 x_buttons.forEach(button => {
     button.addEventListener("click", () => {
@@ -127,7 +125,7 @@ function submitForm(event) {
     checkPoint(x, y, r, true);
 }
 
-async function checkPoint(x, y, r, redirect){
+function checkPoint(x, y, r, redirect) {
     //Проводим валидацию
     let result = validate_data(x, y, r);
     show_user_message(result);
@@ -139,21 +137,43 @@ async function checkPoint(x, y, r, redirect){
     queryParams.append("Y", y);
     queryParams.append("R", r);
     queryParams.append("redirect", redirect);
-    try {
-        let response = await fetch(`MyMVC?${queryParams.toString()}`);
-        if (!response.ok) {
+    return fetch(`MyMVC?${queryParams.toString()}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Not OK response status');
+            }
+            if (response.redirected) {
+                window.location.href = response.url;
+            }
+            return response.json();
+        })
+        .then(data => {
+            add_data_to_history(
+                data.x,
+                data.y,
+                data.r,
+                data.hit,
+                data.calculationTime,
+                new Date(data.time[0], data.time[1] - 1, data.time[2], data.time[3], data.time[4], data.time[5]));
+            return data.hit;
+        })
+        .catch(() => {
             show_user_message(message_type.SOME_SERVER_ERROR);
             return null;
-        }
-        if (response.redirected) {
-            window.location.href = response.url;
-        }
-        let responseData = await response.json();
-        return responseData.hit;
-    } catch (error){
-        show_user_message(message_type.SOME_SERVER_ERROR);
-        return null;
-    }
+        });
+}
+
+function add_data_to_history(x, y, r, hit, execution_time, real_time) {
+    let table_ref = document.querySelector("#history_table tbody");
+    let newRow = table_ref.insertRow(0);
+    [
+        x.toFixed(2).toString(),
+        y.toFixed(2).toString(),
+        r.toFixed(2).toString(),
+        hit ? "Попал" : "Промазал",
+        `${real_time.toLocaleDateString()} ${real_time.toLocaleTimeString()}`,
+        execution_time.toString() + "мкс"
+    ].forEach(value => newRow.insertCell().textContent = value);
 }
 
 // Метод генерации сообщений пользователю
@@ -181,4 +201,28 @@ function show_user_message(message) {
 function validate_data(x, y, r) {
     if (x == null || y == null || r == null || y === "") return message_type.EMPTY_FIELDS;
     return message_type.OK;
+}
+
+function loadPoints(){
+    fetch(`MyMVC?data`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Not OK response status');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if(data == null) return;
+            data.data.forEach(point => {
+                console.log(point.x, point.y);
+                calculator.setExpression({
+                    latex: `(${point.x}, ${point.y})`, // Задание координат точки
+                    color: Desmos.Colors.RED // Цвет точки
+                });
+            });
+        })
+        .catch(e => {
+            throw e;
+            // show_user_message(message_type.SOME_SERVER_ERROR);
+        });
 }

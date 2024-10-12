@@ -2,6 +2,7 @@
 <%@ page import="model.DataBean" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="java.text.DecimalFormat" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="ru">
@@ -41,20 +42,21 @@
                     data = new DataBean();
                 }
                 DecimalFormat df = new DecimalFormat("0.00");
-                for (RPoint rPoint : data.getData()) {
+                List<RPoint> arr = data.getData();
+                for (int i = arr.size() - 1; i >= 0; i--) {
             %>
             <tr>
-                <td><%=df.format(rPoint.getX())%>
+                <td><%=df.format(arr.get(i).getX())%>
                 </td>
-                <td><%=df.format(rPoint.getY())%>
+                <td><%=df.format(arr.get(i).getY())%>
                 </td>
-                <td><%=df.format(rPoint.getR())%>
+                <td><%=df.format(arr.get(i).getR())%>
                 </td>
-                <td><%=rPoint.isHit() ? "Попал" : "Промазал"%>
+                <td><%=arr.get(i).isHit() ? "Попал" : "Промазал"%>
                 </td>
-                <td><%=rPoint.getTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))%>
+                <td><%=arr.get(i).getTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))%>
                 </td>
-                <td><%=rPoint.getCalculationTime()%>мкс
+                <td><%=arr.get(i).getCalculationTime()%>мкс
                 </td>
             </tr>
             <%}%>
