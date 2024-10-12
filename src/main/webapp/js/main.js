@@ -1,3 +1,5 @@
+import {drawPoint, drawBatman, getClickCoordinates} from "./graph.js";
+
 window.addEventListener("load", loadPoints);
 // Подобие enum для обработки исключений и вывода сообщений
 const message_type = Object.freeze({
@@ -7,89 +9,19 @@ const message_type = Object.freeze({
     CHOOSE_R: 4
 });
 
-let elt = document.getElementById('calculator');
-let calculator = Desmos.GraphingCalculator(elt, {
-    keypad: false,
-    expressions: false,
-    settingsMenu: false,
-    lockViewport: true,
-    zoomFit: true,
-    pointsOfInterest: false,
-    trace: false,
-    xAxisStep: 1,
-    yAxisStep: 1
-});
-
 let selectedR = null;
 
-elt.addEventListener('click', function (evt) {
+document.getElementById('calculator').addEventListener('click', function (evt) {
     if (selectedR == null) {
         show_user_message(message_type.CHOOSE_R);
         return;
     }
-    let calculatorRect = elt.getBoundingClientRect();
-    let {x, y} = calculator.pixelsToMath({
-        x: evt.clientX - calculatorRect.left,
-        y: evt.clientY - calculatorRect.top
-    });
-    let response = checkPoint(x, y, selectedR, false);
+    let point = getClickCoordinates(evt.clientX, evt.clientY);
+    let response = checkPoint(point.x, point.y, selectedR, false);
     if (response != null) {
-        calculator.setExpression({
-            latex: `(${x}, ${y})`, // Задание координат точки
-            color: Desmos.Colors.RED // Цвет точки
-        });
+        drawPoint(point);
     }
 });
-
-function drawBatman(r) {
-    let k = 49 / r
-    calculator.setExpression({
-        id: 'k',
-        latex: 'k=' + k.toString()
-    });
-    calculator.setExpression({
-        id: 's',
-        latex: '\\s(x)=\\sqrt{(\\abs(x*k/7))/(x*k/7)}',
-        hidden: true
-    });
-    calculator.setExpression({
-        id: 'graph2',
-        latex: '(x*k/49)^2*s(\\abs(x*k/7)-3)+(y*k/21)^2*s(y*k/7+3*\\sqrt{33}/7)-1=0',
-        color: 'black'
-    });
-    calculator.setExpression({
-        id: 'graph3',
-        latex: '\\abs(x*k/14)-((3*\\sqrt{33}-7)/112)*(x*k/7)^2-3+\\sqrt{1-(\\abs(\\abs(x*k/7)-2)-1)^2}-y*k/7=0',
-        color: 'black'
-    });
-    calculator.setExpression({
-        id: 'graph4',
-        latex: '9*s((1-\\abs(x*k/7))*(\\abs(x*k/7)-.75))-8*\\abs(x*k/7)-y*k/7=0',
-        color: 'black'
-    });
-    calculator.setExpression({
-        id: 'graph5',
-        latex: '3*\\abs(x*k/7)+.75*s((.75-\\abs(x*k/7))*(\\abs(x*k/7)-.5))-y*k/7=0',
-        color: 'black'
-    });
-    calculator.setExpression({
-        id: 'graph6',
-        latex: '2.25*s((.5-x*k/7)*(x*k/7+.5))-y*k/7=0',
-        color: 'black'
-    });
-    calculator.setExpression({
-        id: 'graph7',
-        latex: '6*\\sqrt{10}/7+(1.5-.5*\\abs(x*k/7))*s(\\abs(x*k/7)-1)-6*\\sqrt{10}/14*\\sqrt{4-(\\abs(x*k/7)-1)^2}-y*k/7=0',
-        color: 'black'
-    });
-
-    calculator.setMathBounds({
-        left: -r - 1,
-        right: r + 1,
-        bottom: -r - 1,
-        top: r + 1
-    });
-}
 
 const r_radiobuttons = document.getElementsByName("r_radio_input");
 r_radiobuttons.forEach(radiobutton => {
@@ -114,6 +46,7 @@ x_buttons.forEach(button => {
     })
 });
 
+document.getElementById("form").addEventListener("submit", () => submitForm(event));
 //Функция отправки запроса на сервер и получения ответа
 function submitForm(event) {
     event.preventDefault();
@@ -214,11 +147,7 @@ function loadPoints(){
         .then(data => {
             if(data == null) return;
             data.data.forEach(point => {
-                console.log(point.x, point.y);
-                calculator.setExpression({
-                    latex: `(${point.x}, ${point.y})`, // Задание координат точки
-                    color: Desmos.Colors.RED // Цвет точки
-                });
+                drawPoint(point)
             });
         })
         .catch(e => {
