@@ -2,5 +2,5 @@
 <header>
     <span>Ступин Тимур</span>
     <span>P3208</span>
-    <span>Вариант: 229</span>
+    <span>Вариант: 410744</span>
 </header>

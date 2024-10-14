@@ -2,7 +2,7 @@ package model;
 
 import java.time.LocalDateTime;
 
-public class RPoint {
+public class PointBean {
     private double x;
     private double y;
     private double r;

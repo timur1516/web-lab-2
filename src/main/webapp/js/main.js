@@ -1,7 +1,7 @@
-import {drawPoint, drawBatman, getClickCoordinates} from "./graph.js";
+import {draw_point, draw_batman, get_click_coordinates} from "./graph.js";
 
-window.addEventListener("load", loadPoints);
-// Подобие enum для обработки исключений и вывода сообщений
+window.addEventListener("load", load_points);
+
 const message_type = Object.freeze({
     OK: 1,
     EMPTY_FIELDS: 2,
@@ -9,29 +9,27 @@ const message_type = Object.freeze({
     CHOOSE_R: 4
 });
 
-let selectedR = null;
-
+let selected_r = null;
 document.getElementById('calculator').addEventListener('click', async function (evt) {
-    if (selectedR == null) {
+    if (selected_r == null) {
         show_user_message(message_type.CHOOSE_R);
         return;
     }
-    let point = getClickCoordinates(evt.clientX, evt.clientY);
-    const hit = await check_point(point.x, point.y, selectedR, false);
-    drawPoint(point, hit ? 'green' : 'red');
+    let point = get_click_coordinates(evt.clientX, evt.clientY);
+    const hit = await check_point(point.x, point.y, selected_r, false);
+    if(hit == null) return;
+    draw_point(point, hit ? 'green' : 'red');
 });
 
-const r_radiobuttons = document.getElementsByName("r_radio_input");
-r_radiobuttons.forEach(radiobutton => {
+document.getElementsByName("r_radio_input").forEach(radiobutton => {
     radiobutton.addEventListener("change", () => {
-        selectedR = radiobutton.value;
-        drawBatman(Number(selectedR));
+        selected_r = radiobutton.value;
+        draw_batman(Number(selected_r));
     });
 });
 
 let active_x_button = null;
-const x_buttons = document.getElementsByName("x_button_input");
-x_buttons.forEach(button => {
+document.getElementsByName("x_button_input").forEach(button => {
     button.addEventListener("click", () => {
         if (button === active_x_button) {
             active_x_button.style.borderColor = 'black';
@@ -44,10 +42,9 @@ x_buttons.forEach(button => {
     })
 });
 
-document.getElementById("form").addEventListener("submit", () => submitForm(event));
+document.getElementById("form").addEventListener("submit", () => submit_form(event));
 
-//Функция отправки запроса на сервер и получения ответа
-async function submitForm(event) {
+async function submit_form(event) {
     event.preventDefault();
     //Извлекаем данные формы
     const formData = new FormData(event.target);
@@ -68,7 +65,7 @@ async function check_point(x, y, r, redirect) {
     queryParams.append("R", r);
     queryParams.append("redirect", redirect);
     try {
-        const response = await fetch(`MyMVC?${queryParams.toString()}`);
+        const response = await fetch(`Controller?${queryParams.toString()}`);
         if (response.redirected ^ redirect) {
             show_user_message(message_type.SOME_SERVER_ERROR);
             return;
@@ -106,7 +103,6 @@ function add_data_to_history(x, y, r, hit, execution_time, real_time) {
     ].forEach(value => newRow.insertCell().textContent = value);
 }
 
-// Метод генерации сообщений пользователю
 function show_user_message(message) {
     let error_field = document.getElementById("error_field");
     error_field.style.visibility = "visible";
@@ -133,15 +129,15 @@ function validate_data(x, y, r) {
     return message_type.OK;
 }
 
-function loadPoints() {
-    fetch(`MyMVC?data`)
+function load_points() {
+    fetch(`Controller?data`)
         .then(response => {
             return response.json();
         })
         .then(data => {
             if (data == null) return;
             data.data.forEach(point => {
-                drawPoint(point, point.hit ? 'green' : 'red');
+                draw_point(point, point.hit ? 'green' : 'red');
             });
         })
         .catch(() => {

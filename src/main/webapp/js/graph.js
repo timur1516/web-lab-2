@@ -11,7 +11,7 @@ const calculator = Desmos.GraphingCalculator(elt, {
     yAxisStep: 1
 });
 
-export function getClickCoordinates(xClick, yClick){
+export function get_click_coordinates(xClick, yClick){
     let calculatorRect = elt.getBoundingClientRect();
     return calculator.pixelsToMath({
         x: xClick - calculatorRect.left,
@@ -19,14 +19,14 @@ export function getClickCoordinates(xClick, yClick){
     })
 }
 
-export function drawPoint(point, color){
+export function draw_point(point, color){
     calculator.setExpression({
         latex: `(${point.x}, ${point.y})`, // Задание координат точки
         color: color // Цвет точки
     });
 }
 
-export function drawBatman(r) {
+export function draw_batman(r) {
     let k = 49 / r
     calculator.setExpression({
         id: 'k',

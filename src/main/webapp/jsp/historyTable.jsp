@@ -1,6 +1,6 @@
-<%@ page import="model.DataBean" %>
+<%@ page import="model.Data" %>
 <%@ page import="java.text.DecimalFormat" %>
-<%@ page import="model.RPoint" %>
+<%@ page import="model.PointBean" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -18,13 +18,13 @@
         </thead>
         <tbody>
         <%
-            DataBean data = (DataBean) request.getSession().getAttribute("data");
-            System.out.println(data);
+            Data data = (Data) request.getSession().getAttribute("data");
             if (data == null) {
-                data = new DataBean();
+                data = new Data();
+                request.getSession().setAttribute("data", data);
             }
             DecimalFormat df = new DecimalFormat("0.00");
-            List<RPoint> arr = data.getData();
+            List<PointBean> arr = data.getData();
             for (int i = arr.size() - 1; i >= 0; i--) {
         %>
         <tr>

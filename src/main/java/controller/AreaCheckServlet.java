@@ -1,12 +1,11 @@
 package controller;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
-import model.DataBean;
-import model.RPoint;
+import model.Data;
+import model.PointBean;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,29 +16,30 @@ public class AreaCheckServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        RPoint rPoint = new RPoint();
-        rPoint.setTime(LocalDateTime.now());
-        boolean redirect = true;
+        PointBean pointBean = new PointBean();
+        pointBean.setTime(LocalDateTime.now());
+        boolean redirect;
         try {
-            rPoint.setX(Double.parseDouble(req.getParameter("X")));
-            rPoint.setY(Double.parseDouble(req.getParameter("Y")));
-            rPoint.setR(Double.parseDouble(req.getParameter("R")));
+            pointBean.setX(Double.parseDouble(req.getParameter("X")));
+            pointBean.setY(Double.parseDouble(req.getParameter("Y")));
+            pointBean.setR(Double.parseDouble(req.getParameter("R")));
             redirect = Boolean.parseBoolean(req.getParameter("redirect"));
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
 
         long startTime = System.nanoTime() / 1000;
-        rPoint.setHit(isHit(rPoint));
+        pointBean.setHit(isHit(pointBean));
         long endTime = System.nanoTime() / 1000;
-        rPoint.setCalculationTime(endTime - startTime);
+        pointBean.setCalculationTime(endTime - startTime);
 
-        DataBean data = (DataBean) req.getSession().getAttribute("data");
+        Data data = (Data) req.getSession().getAttribute("data");
         if (data == null) {
-            data = new DataBean();
+            data = new Data();
             req.getSession().setAttribute("data", data);
         }
-        data.addRPoint(rPoint);
+        data.addRPoint(pointBean);
         req.getSession().setAttribute("data", data);
         if (redirect) {
             resp.sendRedirect(req.getContextPath() + "/jsp/result.jsp");
@@ -49,16 +49,16 @@ public class AreaCheckServlet extends HttpServlet {
             resp.setCharacterEncoding("UTF-8");
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.findAndRegisterModules();
-            String jsonResponse = objectMapper.writeValueAsString(rPoint);
+            String jsonResponse = objectMapper.writeValueAsString(pointBean);
             out.print(jsonResponse);
             out.flush();
         }
     }
 
-    private boolean isHit(RPoint rPoint) {
-        double x = rPoint.getX();
-        double y = rPoint.getY();
-        double r = rPoint.getR();
+    private boolean isHit(PointBean pointBean) {
+        double x = pointBean.getX();
+        double y = pointBean.getY();
+        double r = pointBean.getR();
         double firstAreaA = Math.abs(x) / (r / 7) - 3;
         double firstSecondAreaA = Math.abs(y / (r / 7) + (double) 3 / 7 * Math.sqrt(33));
         double firstSecondAreaB = Math.pow((y / (r / 7)) / 3, 2);
