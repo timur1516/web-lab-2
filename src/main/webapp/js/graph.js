@@ -8,7 +8,8 @@ const calculator = Desmos.GraphingCalculator(elt, {
     pointsOfInterest: false,
     trace: false,
     xAxisStep: 1,
-    yAxisStep: 1
+    yAxisStep: 1,
+    showGrid: false
 });
 
 export function get_click_coordinates(xClick, yClick){

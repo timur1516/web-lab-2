@@ -6,7 +6,7 @@
 
     <groupId>ru.timur</groupId>
     <artifactId>Web2</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <name>Web2</name>
     <packaging>war</packaging>
 
@@ -51,6 +51,7 @@
     </dependencies>
 
     <build>
+        <finalName>Web2</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -42,7 +42,11 @@ document.getElementsByName("x_button_input").forEach(button => {
     })
 });
 
-document.getElementById("form").addEventListener("submit", () => submit_form(event));
+document.getElementById("form").addEventListener("submit", async () =>{
+    await submit_form(event);
+});
+
+let prev_point;
 
 async function submit_form(event) {
     event.preventDefault();
@@ -51,7 +55,17 @@ async function submit_form(event) {
     const x = active_x_button == null ? null : active_x_button.value;
     const y = formData.get("y_text_input");
     const r = formData.get("r_radio_input");
-    await check_point(x, y, r, true);
+    const hit = await check_point(x, y, r, false);
+    if(hit == null) return;
+
+    const animatedDiv = document.getElementById('main_form');
+    animatedDiv.classList.add('animate');
+
+    // Удаляем класс после завершения анимации, чтобы можно было запустить снова
+    animatedDiv.addEventListener('animationend', function() {
+        animatedDiv.classList.remove('animate');
+        draw_point({x, y}, hit ? 'green' : 'red');
+    }, { once: true });
 }
 
 async function check_point(x, y, r, redirect) {

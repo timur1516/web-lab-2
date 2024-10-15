@@ -13,7 +13,7 @@
 <jsp:include page="jsp/header.jsp"/>
 <section class="main_content">
     <p id="error_field"></p>
-    <div class="main_form">
+    <div class="main_form" id="main_form">
         <form class="form" id="form">
             <div class="form_input">
                 <p class="form_input x_label">X</p>
