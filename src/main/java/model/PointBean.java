@@ -1,14 +1,17 @@
 package model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class PointBean {
+public class PointBean implements Serializable {
     private double x;
     private double y;
     private double r;
     private boolean hit;
     private LocalDateTime time;
     private long calculationTime;
+
+    public PointBean() {}
 
     public double getX() {
         return x;

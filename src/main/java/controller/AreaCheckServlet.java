@@ -3,7 +3,6 @@ package controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
 import model.Data;
 import model.PointBean;
 
@@ -11,7 +10,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 
-@WebServlet("/AreaCheck")
 public class AreaCheckServlet extends HttpServlet {
 
     @Override

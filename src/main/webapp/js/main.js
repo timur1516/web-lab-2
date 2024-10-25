@@ -79,7 +79,7 @@ async function check_point(x, y, r, redirect) {
     queryParams.append("R", r);
     queryParams.append("redirect", redirect);
     try {
-        const response = await fetch(`Controller?${queryParams.toString()}`);
+        const response = await fetch(`controller?${queryParams.toString()}`);
         if (response.redirected ^ redirect) {
             show_user_message(message_type.SOME_SERVER_ERROR);
             return;
@@ -144,7 +144,7 @@ function validate_data(x, y, r) {
 }
 
 function load_points() {
-    fetch(`Controller?data`)
+    fetch(`controller?data`)
         .then(response => {
             return response.json();
         })
